@@ -1831,10 +1831,11 @@ func (c *codecFner) get(rt reflect.Type, checkFastpath, checkCodecSelfer bool) (
 				}
 				// fn.fd = (*Decoder).kArray
 			case reflect.Struct:
-				if ti.anyOmitEmpty {
+				if ti.anyOmitEmpty || ti.ufh || ti.ufhp {
+					fi.addrE = true
 					fn.fe = (*Encoder).kStruct
 				} else {
-					fn.fe = (*Encoder).kStructNoOmitempty
+					fn.fe = (*Encoder).kStructNoOmitemptyOrUnknown
 				}
 				fn.fd = (*Decoder).kStruct
 			case reflect.Map:
