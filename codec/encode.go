@@ -475,7 +475,7 @@ func (e *Encoder) kSlice(f *codecFnInfo, rv reflect.Value) {
 	}
 }
 
-func (e *Encoder) kStructNoOmitempty(f *codecFnInfo, rv reflect.Value) {
+func (e *Encoder) kStructNoOmitemptyOrUnknown(f *codecFnInfo, rv reflect.Value) {
 	fti := f.ti
 	elemsep := e.esep
 	tisfi := fti.sfiSrc
@@ -589,9 +589,10 @@ func (e *Encoder) kStruct(f *codecFnInfo, rv reflect.Value) {
 	newlen = 0
 	var kv stringRv
 	recur := e.h.RecursiveEmptyCheck
-	sfn := structFieldNode{v: rv, update: false}
+	rvs := rv.Elem()
+	sfn := structFieldNode{v: rvs, update: false}
 	for _, si := range tisfi {
-		// kv.r = si.field(rv, false)
+		// kv.r = si.field(rvs, false)
 		kv.r = sfn.field(si)
 		if toMap {
 			if si.omitEmpty() && isEmptyValue(kv.r, e.h.TypeInfos, recur, recur) {
