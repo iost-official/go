@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"strconv"
 )
 
 // Some tagging information for error messages.
@@ -234,6 +235,9 @@ type DecodeOptions struct {
 	// If true, we will delete the mapping of the key.
 	// Else, just set the mapping to the zero value of the type.
 	DeleteOnNilMapValue bool
+
+	// use int type key for struct key element
+	UseIntKeyStructDec bool
 }
 
 // ------------------------------------
@@ -1185,7 +1189,15 @@ func (d *Decoder) kStruct(f *codecFnInfo, rv reflect.Value) {
 			if elemsep {
 				dd.ReadMapElemKey()
 			}
-			rvkencname = decStructFieldKey(dd, fti.keyType, &d.b)
+			var rvkencname string
+			if (d.h.UseIntKeyStructDec) {
+				// get element as int
+				rvkencname = strconv.Itoa(int(dd.DecodeInt(8)))
+			} else {
+				// get element as string
+				rvkencnameB := dd.DecodeStringAsBytes()
+				rvkencname = stringView(rvkencnameB)
+			}
 			if elemsep {
 				dd.ReadMapElemValue()
 			}
